@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DelftCaseUtilities.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">delft.DelftCaseUtilitiesTest</a> &gt; <a href="index.source.html" class="el_package">delft</a> &gt; <span class="el_source">DelftCaseUtilities.java</span></div><h1>DelftCaseUtilities.java</h1><pre class="source lang-java linenums">package delft;
+
+import java.util.HashSet;
+import java.util.Set;
+
+<span class="fc" id="L6">class DelftCaseUtilities {</span>
+
+	/**
+	 * Converts all the delimiter separated words in a String into camelCase, that
+	 * is each word is made up of a titlecase character and then a series of
+	 * lowercase characters.
+	 *
+	 * &lt;p&gt;
+	 * The delimiters represent a set of characters understood to separate words.
+	 * The first non-delimiter character after a delimiter will be capitalized. The
+	 * first String character may or may not be capitalized and it's determined by
+	 * the user input for capitalizeFirstLetter variable.
+	 *
+	 * &lt;p&gt;
+	 * A &lt;code&gt;null&lt;/code&gt; input String returns &lt;code&gt;null&lt;/code&gt;. Capitalization
+	 * uses the Unicode title case, normally equivalent to upper case and cannot
+	 * perform locale-sensitive mappings.
+	 *
+	 * @param str
+	 *            the String to be converted to camelCase, may be null
+	 * @param capitalizeFirstLetter
+	 *            boolean that determines if the first character of first word
+	 *            should be title case.
+	 * @param delimiters
+	 *            set of characters to determine capitalization, null and/or empty
+	 *            array means whitespace
+	 * @return camelCase of String, &lt;code&gt;null&lt;/code&gt; if null String input
+	 */
+	public String toCamelCase(String str, final boolean capitalizeFirstLetter, final char... delimiters) {
+<span class="pc bpc" id="L35" title="2 of 4 branches missed.">		if (str == null || str.isEmpty()) {</span>
+<span class="nc" id="L36">			return str;</span>
+		}
+<span class="fc" id="L38">		str = str.toLowerCase();</span>
+<span class="fc" id="L39">		final int strLen = str.length();</span>
+<span class="fc" id="L40">		final int[] newCodePoints = new int[strLen];</span>
+<span class="fc" id="L41">		int outOffset = 0;</span>
+<span class="fc" id="L42">		final Set&lt;Integer&gt; delimiterSet = generateDelimiterSet(delimiters);</span>
+<span class="fc" id="L43">		boolean capitalizeNext = false;</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">		if (capitalizeFirstLetter) {</span>
+<span class="nc" id="L45">			capitalizeNext = true;</span>
+		}
+<span class="fc bfc" id="L47" title="All 2 branches covered.">		for (int index = 0; index &lt; strLen;) {</span>
+<span class="fc" id="L48">			final int codePoint = str.codePointAt(index);</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">			if (delimiterSet.contains(codePoint)) {</span>
+<span class="nc" id="L50">				capitalizeNext = true;</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">				if (outOffset == 0) {</span>
+<span class="nc" id="L52">					capitalizeNext = false;</span>
+				}
+<span class="nc" id="L54">				index += Character.charCount(codePoint);</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">			} else if (capitalizeNext) {</span>
+<span class="nc" id="L56">				final int titleCaseCodePoint = Character.toTitleCase(codePoint);</span>
+<span class="nc" id="L57">				newCodePoints[outOffset++] = titleCaseCodePoint;</span>
+<span class="nc" id="L58">				index += Character.charCount(titleCaseCodePoint);</span>
+<span class="nc" id="L59">				capitalizeNext = false;</span>
+<span class="nc" id="L60">			} else {</span>
+<span class="fc" id="L61">				newCodePoints[outOffset++] = codePoint;</span>
+<span class="fc" id="L62">				index += Character.charCount(codePoint);</span>
+			}
+<span class="fc" id="L64">		}</span>
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">		if (outOffset != 0) {</span>
+<span class="fc" id="L66">			return new String(newCodePoints, 0, outOffset);</span>
+		}
+<span class="nc" id="L68">		return str;</span>
+	}
+
+	/**
+	 * Converts an array of delimiters to a hash set of code points. Code point of
+	 * space(32) is added as the default value. The generated hash set provides O(1)
+	 * lookup time.
+	 *
+	 * @param delimiters
+	 *            set of characters to determine capitalization, null means
+	 *            whitespace
+	 * @return Set&lt;Integer&gt;
+	 */
+	private Set&lt;Integer&gt; generateDelimiterSet(final char[] delimiters) {
+<span class="fc" id="L82">		final Set&lt;Integer&gt; delimiterHashSet = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L83">		delimiterHashSet.add(Character.codePointAt(new char[]{' '}, 0));</span>
+<span class="pc bpc" id="L84" title="2 of 4 branches missed.">		if (delimiters == null || delimiters.length == 0) {</span>
+<span class="nc" id="L85">			return delimiterHashSet;</span>
+		}
+<span class="fc bfc" id="L87" title="All 2 branches covered.">		for (int index = 0; index &lt; delimiters.length; index++) {</span>
+<span class="fc" id="L88">			delimiterHashSet.add(Character.codePointAt(delimiters, index));</span>
+		}
+<span class="fc" id="L90">		return delimiterHashSet;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
